@@ -23,47 +23,20 @@
 ;; - {{{user-option(telega-appindicator-labels, 2)}}}
 (require 'cl-lib)
 
-(defcustom slack-notifier-use-label nil
-  "Non-nil to add text labels to the icon.
-Otherwise use just icon to show info.
-labels are not supported by XEMBED based system trays, such as
-`exwm-systemtray' or `polybar'."
-  :type 'boolean
-  :group 'slack-notifier)
+;; (defcustom slack-notifier-use-label nil
+;;   "Non-nil to add text labels to the icon.
+;; Otherwise use just icon to show info.
+;; labels are not supported by XEMBED based system trays, such as
+;; `exwm-systemtray' or `polybar'."
+;;   :type 'boolean
+;;   :group 'slack-notifier)
 
-(defcustom slack-notifier-icon-colors
-  '((offline "white" "black" nil)
-    (online "#7739aa" "white" "#00ff00")
-    (connecting "gray" "white" "white"))
-  "Colors to use for offline/online appindicator icon.
-Alist with `offline', `online' or `connecting' as key, and value in form
-(CIRCLE-COLOR TRIANGLE-COLOR ONLINE-CIRCLE-COLOR)."
-  :type 'list
-  :group 'slack-notifier)
+(defvar slack-notifier-new-messages-icon)
 
-(defcustom slack-notifier-show-account-name t
-  "*Non-nil to show current account name in appindicator label.
-Applied only if `slack-notifier-use-label' is non-nil."
-  :type 'boolean
-  :group 'slack-notifier)
+(defvar slack-notifier-no-messages-icon)
 
-(defcustom slack-notifier-show-mentions t
-  "*Non-nil to show number of mentions in appindicator label.
-Applied only if `slack-notifier-use-label' is non-nil."
-  :type 'boolean
-  :group 'slack-notifier)
 
-(defcustom slack-notifier-labels
-  '("❶" "❷" "❸" "❹" "❺" "❻" "❼" "❽" "❾" "❿"
-    "⓫" "⓬" "⓭" "⓮" "⓯" "⓰" "⓱" "⓲" "⓳" "⓴")
-  "List of number labels to use for the number of unread unmuted chats.
-Use this labels instead of plain number.
-Set to nil to use plain number."
-  :type 'list
-  :group 'slack-notifier)
 
-(defvar telega-appindicator--cached-icons nil
-  "Cached icons for offline/online statuses.")
 
 ;;;###autoload
 (define-minor-mode slack-notifier-mode
@@ -163,34 +136,6 @@ Set to nil to use plain number."
         (t
          (message "telega-server: Unknown appindicator-event: %s" event))))
 
-
-
-
-
-(declare-function telega-chats-dirty--update "telega-tdlib-events")
-
-(declare-function telega "telega")
-(declare-function telega-root--buffer "telega-root")
-(declare-function telega-status--set "telega-root" (conn-status &optional aux-status raw))
-
-(declare-function telega-appindicator--on-event "telega-modes" (event))
-
-
-(defun telega--on-event (event)
-  (let ((event-name (plist-get event :@type)))
-    (if (member event-name telega-server--inhibit-events)
-        (telega-debug "event %s: %S" (propertize "IGNORED" 'face 'bold)
-                      event)
-
-      (let ((event-sym (intern (concat "telega--on-" event-name))))
-        (if (symbol-function event-sym)
-            (funcall (symbol-function event-sym) event)
-
-          (telega-debug "TODO: define `%S'" event-sym))))))
-
-(defun telega--on-error (err)
-  (message "Telega error %s: %s"
-           (plist-get err :code) (plist-get err :message)))
 
 ;; Server runtime vars
 (defvar slack-notifier--buffer nil)

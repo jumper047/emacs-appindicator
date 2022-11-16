@@ -66,10 +66,6 @@ const char* version = "0.8.1";
 /* true when stdin_loop() is running */
 volatile bool server_running;
 
-int parse_mode = 0;
-#define PARSE_MODE_JSON 1
-#define PARSE_MODE_PLIST 2
-
 void
 usage(char* prog)
 {
@@ -202,34 +198,6 @@ stdin_loop()
         tdat_drop(&json_dst);
 }
 
-static void
-parse_stdin(void)
-{
-        struct telega_dat src = TDAT_INIT;
-
-#define RDSIZE 1024
-        tdat_ensure(&src, RDSIZE);
-
-        ssize_t rlen;
-        while ((rlen = read(0, &src.data[src.end], RDSIZE)) > 0) {
-                src.end += rlen;
-                tdat_ensure(&src, RDSIZE);
-        }
-#undef RDSIZE
-        tdat_append1(&src, "\0");
-
-        struct telega_dat dst = TDAT_INIT;
-        if (parse_mode == PARSE_MODE_JSON)
-                tdat_json_value(&src, &dst);
-        else
-                tdat_plist_value(&src, &dst);
-        tdat_append1(&dst, "\0");
-
-        printf("%s\n", dst.data);
-
-        tdat_drop(&src);
-        tdat_drop(&dst);
-}
 
 int
 main(int ac, char** av)
@@ -237,25 +205,12 @@ main(int ac, char** av)
         int ch;
         while ((ch = getopt(ac, av, "L:E:R:f:jpl:v:h")) != -1) {
                 switch (ch) {
-                case 'j':
-                        parse_mode = PARSE_MODE_JSON;
-                        break;
-                case 'p':
-                        parse_mode = PARSE_MODE_PLIST;
-                        break;
                 case 'h':
                 case '?':
                 default:
                         usage(av[0]);
                         /* NOT REACHED */
                 }
-        }
-
-
-        if (parse_mode) {
-                parse_stdin();
-                return 0;
-                /* NOT REACHED */
         }
 
         server_running = true;

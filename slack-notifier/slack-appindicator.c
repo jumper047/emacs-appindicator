@@ -61,7 +61,7 @@ appindicator_setup(char* icon_path)
                 app_indicator_set_status(appind, APP_INDICATOR_STATUS_ACTIVE);
 
                 menu = gtk_menu_new();
-                GtkWidget* item = gtk_menu_item_new_with_label("Open telega");
+                GtkWidget* item = gtk_menu_item_new_with_label("Open slack");
                 g_signal_connect(item, "activate",
                                  G_CALLBACK(appindicator_click_cb), "\"open\"");
                 gtk_menu_shell_append(GTK_MENU_SHELL(menu), item);

@@ -32,7 +32,6 @@
 ;;   :group 'slack-notifier)
 
 (defvar slack-notifier-new-messages-icon)
-
 (defvar slack-notifier-no-messages-icon)
 
 
@@ -123,15 +122,17 @@
   (cond ((string= event "open")
          ;; NOTE: Raise Emacs frame and open rootbuf
          (x-focus-frame nil)
-         (telega)
+         ;; (telega)
          ;; If there is single important chat, then switch to it
-         (let ((ichats (telega-filter-chats telega--ordered-chats 'important)))
-           (when (= 1 (length ichats))
-             (telega-switch-important-chat (car ichats)))))
+         ;; (let ((ichats (telega-filter-chats telega--ordered-chats 'important)))
+         ;;   (when (= 1 (length ichats))
+         ;;     (telega-switch-important-chat (car ichats))))
+	 )
 
         ((string= event "quit")
          (x-focus-frame nil)
-         (telega-kill nil))
+         ;; (telega-kill nil)
+	 )
 
         (t
          (message "telega-server: Unknown appindicator-event: %s" event))))
@@ -349,7 +350,7 @@ Return parsed command."
   "Dispatch command CMD."
 
   (cond  ((string= cmd "appindicator-event")
-         (telega-appindicator--on-event value))
+         (slack-notifier--on-event value))
 
         (t
          (error "Unknown cmd from telega-server: %s" cmd))))
@@ -392,7 +393,6 @@ Return parsed command."
       )))
 
 (defun slack-notifier--sentinel (proc event)
-  "Sentinel for the telega-server process."
   (let ((status (substring event 0 -1)) ; strip trailing \n
         (err (if (buffer-live-p (process-buffer proc))
                  (with-current-buffer (process-buffer proc) (buffer-string))
@@ -410,7 +410,6 @@ Return parsed command."
         (t obj)))
 
 (defun slack-notifier--send (sexp &optional command)
-  "Send SEXP to telega-server."
   (let* ((print-circle nil)
          (print-level nil)
          (print-length nil)
@@ -420,7 +419,7 @@ Return parsed command."
     (cl-assert (process-live-p proc) nil "slack-notifier is not running")
     (message "%s: %s %d %s"
                   (propertize "OUTPUT" 'face 'bold)
-                  (or command "send") (string-bytes value)
+                  (or command "appindicator") (string-bytes value)
                   value)
 
     (process-send-string
@@ -435,22 +434,12 @@ Return parsed command."
   (when (process-live-p (slack-notifier--proc))
     (user-error "Error: slack-notifier already running"))
 
-  ;; (cl-assert (buffer-live-p (telega-root--buffer)) nil
-  ;;            "Use M-x telega RET to start telega")
-
   (let* ((process-connection-type nil)
          (process-adaptive-read-buffering nil)
          (server-cmd "/home/psh/Src/Linux/my/slack-appindicator/slack-notifier/slack-notifier"
 	  ;; (slack-notifier--process-command)
 		     ))
     (with-current-buffer (generate-new-buffer " *slack-notifier*")
-
-      ;; (setq telega-server--on-event-func 'telega--on-event)
-      ;; (setq telega-server--deferred-events nil)
-      ;; (setq telega-server--inhibit-events nil)
-      ;; (setq telega-server--extra 0)
-      ;; (setq telega-server--callbacks (make-hash-table :test 'eq))
-      ;; (setq telega-server--results (make-hash-table :test 'eq))
 
       (setq slack-notifier--buffer (current-buffer))
 

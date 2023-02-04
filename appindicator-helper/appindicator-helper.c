@@ -30,13 +30,15 @@
  * Can send "appindicator-event" when menu buttons are clicked.
  */
 #include <stdio.h>
+#include <string.h>
 #include <stdlib.h>
 #include <stdbool.h>
 #include <assert.h>
+#include <errno.h>
 
 #include <libappindicator/app-indicator.h>
 
-extern void telega_output_json(const char* otype, const char* json);
+extern void send_output(const char* data);
 
 static GMainLoop* loop = NULL;
 static GtkWidget* menu = NULL;
@@ -46,42 +48,43 @@ static void
 appindicator_click_cb(GtkWidget *widget, gpointer data)
 {
         const gchar* text = (const gchar*)data;
-        if (text)
-                telega_output_json("appindicator-event", text);
+        if (text) {
+                send_output(text);
+        }
 }
 
 static void
-appindicator_setup(char* icon_path)
+appindicator_create_menu(char* menu_elts)
 {
-        if (!appind) {
-                appind = app_indicator_new("telega", icon_path,
-                                           APP_INDICATOR_CATEGORY_COMMUNICATIONS);
-                g_assert(IS_APP_INDICATOR(appind));
-
-                app_indicator_set_status(appind, APP_INDICATOR_STATUS_ACTIVE);
-
+        if (appind) {
+                char *menu_elt = strtok(menu_elts, "|");
                 menu = gtk_menu_new();
-                GtkWidget* item = gtk_menu_item_new_with_label("Open slack");
-                g_signal_connect(item, "activate",
-                                 G_CALLBACK(appindicator_click_cb), "\"open\"");
-                gtk_menu_shell_append(GTK_MENU_SHELL(menu), item);
-                gtk_widget_show(item);
+                while(menu_elt) {
+                        if (!strcmp(menu_elt, "-")){
+                                GtkWidget* item = gtk_separator_menu_item_new();
+                                gtk_menu_shell_append(GTK_MENU_SHELL(menu), item);
+                                gtk_widget_show(item);
+                        } else {
+                                GtkWidget* item = gtk_menu_item_new_with_label(menu_elt);
+                                /* https://stackoverflow.com/questions/43303990/c-gtk-g-signal-connect-using-the-data-field */
 
-                item = gtk_separator_menu_item_new();
-                gtk_menu_shell_append(GTK_MENU_SHELL(menu), item);
-                gtk_widget_show(item);
+                                char *persist_menu_elt = (char *)malloc(strlen(menu_elt) + 1 + 2);
 
-                item = gtk_menu_item_new_with_label("Quit telega");
-                g_signal_connect(item, "activate",
-                                 G_CALLBACK(appindicator_click_cb), "\"quit\"");
-                gtk_menu_shell_append(GTK_MENU_SHELL(menu), item);
-                gtk_widget_show(item);
+                                sprintf(persist_menu_elt, "\"%s\"", menu_elt);
+                                
+                                g_signal_connect(item, "activate",
+                                                 G_CALLBACK(appindicator_click_cb), persist_menu_elt);
 
+                                gtk_menu_shell_append(GTK_MENU_SHELL(menu), item);
+                                gtk_widget_show(item);
+                        }
+
+                        menu_elt = strtok(NULL, "|");
+                }
+                
                 app_indicator_set_menu(appind, GTK_MENU(menu));
         } else {
-                app_indicator_set_status(appind, APP_INDICATOR_STATUS_ACTIVE);
-                app_indicator_set_icon_full(appind, icon_path, "telega icon");
-                app_indicator_set_label(appind, "", "");
+                fprintf(stderr, "[emacs-appindicator]: Appindicator already initialized!\n");
         }
 }
 
@@ -95,11 +98,15 @@ appindicator_cmd(void* data)
 
         if (cmd_args == NULL) {
                 /* All commands requires args */
-                fprintf(stderr, "[telega-appindicator]: Invalid cmd -> %s\n",
+                fprintf(stderr, "[emacs-appindicator]: Invalid cmd -> %s\n",
                         cmd);
-        } else if (!strncmp(cmd, "setup ", 6)) {
+        } else if (!strncmp(cmd, "init ", 5)) {
+                appind = app_indicator_new(cmd_args, "invalid",
+                                           APP_INDICATOR_CATEGORY_COMMUNICATIONS);
+                g_assert(IS_APP_INDICATOR(appind));
+        } else if (!strncmp(cmd, "menu ", 5)) {
                 /* setup <icon-path:str> */
-                appindicator_setup(cmd_args);
+                appindicator_create_menu(cmd_args);
         } else if (!strncmp(cmd, "status ", 7)) {
                 /* status <active|passive> */
                 if (appind) {
@@ -113,9 +120,9 @@ appindicator_cmd(void* data)
                 if (appind)
                         app_indicator_set_label(appind, cmd_args, cmd_args);
         } else if (!strncmp(cmd, "icon ", 5)) {
-                app_indicator_set_icon_full(appind, cmd_args, "telega icon");
+                app_indicator_set_icon_full(appind, cmd_args, "emacs appindicator icon");
         } else {
-                fprintf(stderr, "[telega-appindicator]: unknown cmd -> %s\n",
+                fprintf(stderr, "[emacs-appindicator]: unknown cmd -> %s\n",
                         cmd);
         }
 
@@ -124,20 +131,20 @@ appindicator_cmd(void* data)
 }
 
 void
-telega_appindicator_send(const char* json)
+appindicator_send(const char* json)
 {
         char* json_copy = strdup(json);
         g_idle_add(appindicator_cmd, json_copy);
 }
 
 bool
-telega_appindicator_init(void)
+appindicator_init(void)
 {
         return gtk_init_check(NULL, NULL);
 }
 
 void*
-telega_appindicator_loop(void* data)
+appindicator_loop(void* data)
 {
         loop = g_main_loop_new(NULL, FALSE);
         g_main_loop_run(loop);
@@ -145,7 +152,7 @@ telega_appindicator_loop(void* data)
 }
 
 void
-telega_appindicator_stop(void)
+appindicator_stop(void)
 {
         if (loop)
                 g_main_loop_quit(loop);

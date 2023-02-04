@@ -1,0 +1,36 @@
+#+TITLE: Emacs-Appindicator
+
+Package for Emacs to create and control tray icons.
+
+This package contains tiny daemon which creates and controls tray icon via appindicator library, and lisp code to interact with it.
+Daemon can hide/show/change icon, set label (as far as I know, some desktop environments doesn't support this feature), and set up context menus with lisp callbacks. For now, only Linux bases operation systems supported. Please visit issue #1 if you are interested in support for other systems.
+
+* Installation
+** Prerequisites
+To build daemon these packages should be installed:
+- =make=
+- =libappindicator3-dev= (for Ubuntu/Debian, name in your distribution may vary)
+** Emacs Package
+Clone this repository somewhere into your =load-path= and add to your config
+#+begin_src emacs-lisp
+(require 'appindicator)
+#+end_src
+
+With =use-package= you can do something like:
+#+begin_src emacs-lisp
+  (use-package appindicator
+    :load-path "~/paht/to/appindicator/sources")
+#+end_src
+
+* Usage
+The entry point is =appindicator-create= macro - creates multiple functions to control new appindicator-helper instance.
+- appindicator-...-init - starts appindicator-helper process (usually called automatically inside =appindicator-create= macro)
+- appindicator-...-kill - kill appindicator helper process
+- appindicator-...-set-icon - set tray icon
+- appindicator-...-set-label - set label
+- appindicator-...-set-active - hide/show icon
+- appindicator-...-set-menu - set context menu
+
+* Acknowledgements
+- [[https://github.com/zevlg][@zevlg]] for his awesome telega.el, appindicator-helper is heavily inspired by telega-server
+- my ex-coworker, who wants to stay anonymous, for his contribution (which was as precious as controversial)

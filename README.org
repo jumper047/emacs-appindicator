@@ -31,6 +31,15 @@ The entry point is =appindicator-create= macro - creates multiple functions to c
 - appindicator-...-set-active - hide/show icon
 - appindicator-...-set-menu - set context menu
 
+** Note on the svg icons usage
+Function =appindicator-NAME-set-icon= can set both icons from local filesystem and from online collections supported by svg-lib.
+Icons from online collections may be used like this: =(appindicator-NAME-set-icon "icon-name" "collection-name")=. You can check for available collections and icons they contain below:
+- "bootstrap" - https://github.com/twbs/icons
+- "simple" - https://simpleicons.org/
+- "material" - https://mui.com/material-ui/material-icons/
+- "octicons" - https://octicons.github.com
+- "boxicons" - https://boxicons.com/
+
 * Acknowledgements
 - [[https://github.com/zevlg][@zevlg]] for his awesome telega.el, appindicator-helper is heavily inspired by telega-server
 - my ex-coworker, who wants to stay anonymous, for his contribution (which was as precious as controversial)

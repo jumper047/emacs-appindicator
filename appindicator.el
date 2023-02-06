@@ -7,7 +7,7 @@
 ;; Keywords: mouse convenience
 ;; Version: 0.1.0
 
-;; Package-Requires: ((emacs "26.1"))
+;; Package-Requires: ((emacs "27.1") (svg-lib "0.2.5"))
 
 ;; This file is NOT part of GNU Emacs
 
@@ -34,8 +34,8 @@
 ;; icon, label, visibility and context menu
 
 ;;; Code:
-
 (require 'subr-x)
+(require 'appindicator-svg)
 
 (defvar appindicator-helper-executable-name "emacs-appindicator-helper"
   "Appindicator helper's executable name.")
@@ -246,10 +246,27 @@ Most notable functions are:
          (when (buffer-live-p ,buffer-var)
            (kill-buffer ,buffer-var)))
 
-       (defun ,set-icon-fn (icon-path)
-         "Set SVG icon for appindicator.
-ICON-PATH should be absolute."
-         (appindicator--send (format "icon %s" icon-path) ,buffer-var))
+       (defun ,set-icon-fn (icon &optional collection &rest args)
+         "Set tray icon for appindicator helper.
+ICON may be path to svg file or name of the icon from COLLECTION
+\(see `svg-lib' README for more details regarding collections\).
+ARGS may be the following keywords:
+- `:background' and `:foreground' - recolor svg icon"
+
+         (cond ((and (not collection)
+                     (not (equal "svg" (file-name-extension icon))))
+                (when args (display-warning 'appindicator-svg
+                                            (format "%s icon can't be customized"
+                                                    (file-name-extension icon))))
+                (setq icon (expand-file-name icon)))
+               ;; If we don't modify svg icon, there is no need to cache it
+               ((and (not collection)
+                     (not args)
+                     (equal "svg" (file-name-extension icon)))
+                (setq icon (expand-file-name icon)))
+               ('t
+                (setq icon (apply 'appindicator-svg-icon ,name icon collection args))))
+         (appindicator--send (format "icon %s" icon) ,buffer-var))
 
        (defun ,set-label-fn (label-str)
          "Set label with text LABEL-STR for appindicator.

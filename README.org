@@ -39,6 +39,19 @@ Icons from online collections may be used like this: =(appindicator-NAME-set-ico
 - "octicons" - https://octicons.github.com
 - "boxicons" - https://boxicons.com/
 
+** Example
+Code below will create tray icon with context menu:
+#+begin_src emacs-lisp
+  (require 'appindicator)
+  (appindicator-create "emacs")
+  (appindicator-emacs-set-icon "gnuemacs" "simple")
+  (appindicator-emacs-set-label "")
+  (appindicator-emacs-set-menu '(("Minimize to tray" . iconify-or-deiconify-frame)))
+  (appindicator-emacs-set-active 't)
+  (appindicator-emacs-kill)
+#+end_src
+
 * Acknowledgements
-- [[https://github.com/zevlg][@zevlg]] for his awesome telega.el, appindicator-helper is heavily inspired by telega-server
+- [[https://github.com/zevlg][@zevlg]] for his awesome [[https://github.com/zevlg/telega.el][telega.el]], appindicator-helper is heavily inspired by telega-server
 - my ex-coworker, who wants to stay anonymous, for his contribution (which was as precious as controversial)
+- [[https://github.com/rougier][@rougier]] for [[https://github.com/rougier/svg-lib/][svg-lib]] which made this package way more convenient

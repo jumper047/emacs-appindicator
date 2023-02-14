@@ -35,6 +35,16 @@
 ;; be created.
 ;;
 ;; To build appindicator-helper `make' `libappindicator3-dev' packages should be installed
+;;
+;; Usage example:
+;;
+;; (require 'appindicator)
+;; (appindicator-create "emacs")
+;; (appindicator-emacs-set-icon "gnuemacs" "simple")
+;; (appindicator-emacs-set-label "emacs")
+;; (appindicator-emacs-set-menu '(("Minimize to tray" . iconify-or-deiconify-frame)))
+;; (appindicator-emacs-set-active 't)
+;; (appindicator-emacs-kill)
 
 ;;; Code:
 (require 'subr-x)

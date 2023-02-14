@@ -2,6 +2,8 @@
 
 Package for Emacs to create and control tray icons.
 
+[[./screenshot.png]]
+
 This package contains tiny daemon, written in C, which creates and controls tray icon via appindicator library, and lisp code to interact with it. Daemon can hide/show/change icon, set label (as far as I know, some desktop environments doesn't support this feature), and set up context menus with lisp callbacks. For now, only Linux bases operation systems supported. Please visit issue #1 if you are interested in support for other systems.
 
 * Installation

@@ -1,4 +1,4 @@
-;;; appindicator.el --- Create and control appindicators -*- lexical-binding:t -*-
+;;; appindicator.el --- Create and control tray icons -*- lexical-binding:t -*-
 
 ;; Copyright (c) 2022 by Dmitriy Pshonko.
 
@@ -28,10 +28,13 @@
 
 ;;; Commentary:
 
-;; Library to create and control tray icons from Elisp
+;; Library to create and control tray icons from Elisp.
 ;; To create new tray icon run macro `appindicator-create'
 ;; It will create set of functions needed to interact with helper to set up
-;; icon, label, visibility and context menu
+;; icon, label, visibility and context menu. Any number of the tray icons may
+;; be created.
+;;
+;; To build appindicator-helper `make' `libappindicator3-dev' packages should be installed
 
 ;;; Code:
 (require 'subr-x)
@@ -160,7 +163,7 @@ PROC-BUFFER should be process buffer used by helper."
   "Parse command received from appindicator helper.
 MENU-ALIST should be list with cells containing
 context menu entries and callbacks for them,
-like (\"Start\" . start-fn)."
+like (\"Start\" . start-function)."
   (goto-char (point-min))
   (let (cmd-val parsed-commands handler)
     (while (setq cmd-val (appindicator--parse-cmd))

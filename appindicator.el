@@ -1,4 +1,4 @@
-;;; appindicator.el --- Create and control appindicators -*- lexical-binding:t -*-
+;;; appindicator.el --- Create and control tray icons -*- lexical-binding:t -*-
 
 ;; Copyright (c) 2022 by Dmitriy Pshonko.
 
@@ -7,7 +7,7 @@
 ;; Keywords: mouse convenience
 ;; Version: 0.1.0
 
-;; Package-Requires: ((emacs "26.1"))
+;; Package-Requires: ((emacs "27.1") (svg-lib "0.2.5"))
 
 ;; This file is NOT part of GNU Emacs
 
@@ -28,14 +28,27 @@
 
 ;;; Commentary:
 
-;; Library to create and control tray icons from Elisp
+;; Library to create and control tray icons from Elisp.
 ;; To create new tray icon run macro `appindicator-create'
 ;; It will create set of functions needed to interact with helper to set up
-;; icon, label, visibility and context menu
+;; icon, label, visibility and context menu. Any number of the tray icons may
+;; be created.
+;;
+;; To build appindicator-helper `make' `libappindicator3-dev' packages should be installed
+;;
+;; Usage example:
+;;
+;; (require 'appindicator)
+;; (appindicator-create "emacs")
+;; (appindicator-emacs-set-icon "gnuemacs" "simple")
+;; (appindicator-emacs-set-label "emacs")
+;; (appindicator-emacs-set-menu '(("Minimize to tray" . iconify-or-deiconify-frame)))
+;; (appindicator-emacs-set-active 't)
+;; (appindicator-emacs-kill)
 
 ;;; Code:
-
 (require 'subr-x)
+(require 'appindicator-svg)
 
 (defvar appindicator-helper-executable-name "emacs-appindicator-helper"
   "Appindicator helper's executable name.")
@@ -160,7 +173,7 @@ PROC-BUFFER should be process buffer used by helper."
   "Parse command received from appindicator helper.
 MENU-ALIST should be list with cells containing
 context menu entries and callbacks for them,
-like (\"Start\" . start-fn)."
+like (\"Start\" . start-function)."
   (goto-char (point-min))
   (let (cmd-val parsed-commands handler)
     (while (setq cmd-val (appindicator--parse-cmd))
@@ -246,10 +259,27 @@ Most notable functions are:
          (when (buffer-live-p ,buffer-var)
            (kill-buffer ,buffer-var)))
 
-       (defun ,set-icon-fn (icon-path)
-         "Set SVG icon for appindicator.
-ICON-PATH should be absolute."
-         (appindicator--send (format "icon %s" icon-path) ,buffer-var))
+       (defun ,set-icon-fn (icon &optional collection &rest args)
+         "Set tray icon for appindicator helper.
+ICON may be path to svg file or name of the icon from COLLECTION
+\(see `svg-lib' README for more details regarding collections\).
+ARGS may be the following keywords:
+- `:background' and `:foreground' - recolor svg icon"
+
+         (cond ((and (not collection)
+                     (not (equal "svg" (file-name-extension icon))))
+                (when args (display-warning 'appindicator-svg
+                                            (format "%s icon can't be customized"
+                                                    (file-name-extension icon))))
+                (setq icon (expand-file-name icon)))
+               ;; If we don't modify svg icon, there is no need to cache it
+               ((and (not collection)
+                     (not args)
+                     (equal "svg" (file-name-extension icon)))
+                (setq icon (expand-file-name icon)))
+               ('t
+                (setq icon (apply 'appindicator-svg-icon ,name icon collection args))))
+         (appindicator--send (format "icon %s" icon) ,buffer-var))
 
        (defun ,set-label-fn (label-str)
          "Set label with text LABEL-STR for appindicator.

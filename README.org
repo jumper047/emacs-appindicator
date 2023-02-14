@@ -2,14 +2,13 @@
 
 Package for Emacs to create and control tray icons.
 
-This package contains tiny daemon which creates and controls tray icon via appindicator library, and lisp code to interact with it.
-Daemon can hide/show/change icon, set label (as far as I know, some desktop environments doesn't support this feature), and set up context menus with lisp callbacks. For now, only Linux bases operation systems supported. Please visit issue #1 if you are interested in support for other systems.
+This package contains tiny daemon, written in C, which creates and controls tray icon via appindicator library, and lisp code to interact with it. Daemon can hide/show/change icon, set label (as far as I know, some desktop environments doesn't support this feature), and set up context menus with lisp callbacks. For now, only Linux bases operation systems supported. Please visit issue #1 if you are interested in support for other systems.
 
 * Installation
 ** Prerequisites
 To build daemon these packages should be installed:
-- =make=
-- =libappindicator3-dev= (for Ubuntu/Debian, name in your distribution may vary)
+- ~make~
+- ~libappindicator3-dev~ (for Ubuntu/Debian, name in your distribution may vary)
 ** Emacs Package
 Clone this repository somewhere into your =load-path= and add to your config
 #+begin_src emacs-lisp
@@ -31,6 +30,28 @@ The entry point is =appindicator-create= macro - creates multiple functions to c
 - appindicator-...-set-active - hide/show icon
 - appindicator-...-set-menu - set context menu
 
+** Note on the svg icons usage
+Function =appindicator-NAME-set-icon= can set both icons from local filesystem and from online collections supported by svg-lib.
+Icons from online collections may be used like this: =(appindicator-NAME-set-icon "icon-name" "collection-name")=. You can check for available collections and icons they contain below:
+- "bootstrap" - https://github.com/twbs/icons
+- "simple" - https://simpleicons.org/
+- "material" - https://mui.com/material-ui/material-icons/
+- "octicons" - https://octicons.github.com
+- "boxicons" - https://boxicons.com/
+
+** Example
+Code below will create tray icon with context menu:
+#+begin_src emacs-lisp
+  (require 'appindicator)
+  (appindicator-create "emacs")
+  (appindicator-emacs-set-icon "gnuemacs" "simple")
+  (appindicator-emacs-set-label "")
+  (appindicator-emacs-set-menu '(("Minimize to tray" . iconify-or-deiconify-frame)))
+  (appindicator-emacs-set-active 't)
+  (appindicator-emacs-kill)
+#+end_src
+
 * Acknowledgements
-- [[https://github.com/zevlg][@zevlg]] for his awesome telega.el, appindicator-helper is heavily inspired by telega-server
+- [[https://github.com/zevlg][@zevlg]] for his awesome [[https://github.com/zevlg/telega.el][telega.el]], appindicator-helper is heavily inspired by telega-server
 - my ex-coworker, who wants to stay anonymous, for his contribution (which was as precious as controversial)
+- [[https://github.com/rougier][@rougier]] for [[https://github.com/rougier/svg-lib/][svg-lib]] which made this package way more convenient

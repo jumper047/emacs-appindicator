@@ -42,7 +42,10 @@
 ;; (appindicator-create "emacs")
 ;; (appindicator-emacs-set-icon "gnuemacs" "simple")
 ;; (appindicator-emacs-set-label "emacs")
-;; (appindicator-emacs-set-menu '(("Minimize to tray" . iconify-or-deiconify-frame)))
+;; (appindicator-emacs-set-menu
+;;  '(("Minimize to tray" . iconify-or-deiconify-frame)
+;;    separator
+;;    ("Hide icon" . (lambda () (appindicator-emacs-set-active nil)))))
 ;; (appindicator-emacs-set-active 't)
 ;; (appindicator-emacs-kill)
 

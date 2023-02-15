@@ -35,7 +35,7 @@ The entry point is =appindicator-create= macro - creates multiple functions to c
 ** Note on the svg icons usage
 Function =appindicator-NAME-set-icon= can set both icons from local filesystem and from online collections supported by svg-lib.
 Icons from online collections may be used like this: =(appindicator-NAME-set-icon "icon-name" "collection-name")=. You can check for available collections and icons they contain below:
-- "bootstrap" - https://github.com/twbs/icons
+- "bootstrap" - https://icons.getbootstrap.com/
 - "simple" - https://simpleicons.org/
 - "material" - https://mui.com/material-ui/material-icons/
 - "octicons" - https://octicons.github.com

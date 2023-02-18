@@ -23,6 +23,11 @@ With =use-package= you can do something like:
     :load-path "~/paht/to/appindicator/sources")
 #+end_src
 
+Or install it with =quelpa=:
+#+begin_src emacs-lisp
+  (quelpa '(appindicator :repo "jumper047/emacs-appindicator" :fetcher github :files ("*.el" "appindicator-helper")))
+#+end_src
+
 * Usage
 The entry point is =appindicator-create= macro - creates multiple functions to control new appindicator-helper instance.
 - appindicator-...-init - starts appindicator-helper process (usually called automatically inside =appindicator-create= macro)

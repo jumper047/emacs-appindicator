@@ -29,7 +29,7 @@ Or install it with =quelpa=:
 #+end_src
 
 * Usage
-The entry point is =appindicator-create= macro - creates multiple functions to control new appindicator-helper instance.
+The entry point is =appindicator-create= macro - creates functions to control new appindicator-helper instance.
 - appindicator-...-init - starts appindicator-helper process (usually called automatically inside =appindicator-create= macro)
 - appindicator-...-kill - kill appindicator helper process
 - appindicator-...-set-icon - set tray icon

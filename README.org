@@ -66,5 +66,5 @@ Code below will create tray icon with context menu:
 
 * Acknowledgements
 - [[https://github.com/zevlg][@zevlg]] for his awesome [[https://github.com/zevlg/telega.el][telega.el]], appindicator-helper is heavily inspired by telega-server
-- my ex-coworker, who wants to stay anonymous, for his contribution (which was as precious as controversial)
+- [[https://github.com/lynxr][@lynxr]] for his contribution (which was as precious as controversial)
 - [[https://github.com/rougier][@rougier]] for [[https://github.com/rougier/svg-lib/][svg-lib]] which made this package way more convenient

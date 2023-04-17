@@ -36,7 +36,11 @@
 #include <assert.h>
 #include <errno.h>
 
+#ifdef WITH_AYATANA_APPINDICATOR
+#include <libayatana-appindicator/app-indicator.h>
+#else
 #include <libappindicator/app-indicator.h>
+#endif
 
 extern void send_output(const char* data);
 

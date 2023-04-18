@@ -12,7 +12,7 @@ This repository contains library only, check [[https://github.com/jumper047/emac
 ** Prerequisites
 To build daemon these packages should be installed:
 - ~make~
-- ~libappindicator3-dev~ (for Ubuntu/Debian, name in your distribution may vary)
+- ~libappindicator3-dev~  or ~libayatana-appindicator3-dev~ (for Ubuntu/Debian, name in your distribution may vary)
 ** Emacs Package
 Clone this repository somewhere into your =load-path= and add to your config
 #+begin_src emacs-lisp

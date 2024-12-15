@@ -161,7 +161,7 @@ PROC-BUFFER should be process buffer used by helper."
         (message "emacs-appindicator: garbage in process buffer!")
         (delete-region (point-min) (match-beginning 0)))
 
-      (when (> (- (point-max) (point)) sexpsz)
+      (when (> (- (position-bytes (point-max)) (position-bytes (point))) sexpsz)
         (let ((value (read (current-buffer))))
           (prog1
               value
